@@ -56,7 +56,7 @@ export function RecipeForm({
   isSubmitting,
 }: RecipeFormProps) {
   const form = useForm<RecipeFormValues>({
-    resolver: zodResolver(recipeFormSchema),
+    resolver: zodResolver<RecipeFormValues>(recipeFormSchema),
     defaultValues: initialValues ?? baseDefaultValues,
   });
 
