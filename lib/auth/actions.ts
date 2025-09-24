@@ -85,16 +85,16 @@ export async function signUpWithPasswordAction(values: SignUpInput): Promise<Act
   return handleActionSuccess("/dashboard");
 }
 
-export async function signOutAction(): Promise<ActionResult> {
+export async function signOutAction(): Promise<void> {
   const supabase = getSupabaseServerClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return { success: false, message: error.message };
+    throw new Error(error.message);
   }
 
   revalidatePath("/", "layout");
   revalidatePath("/dashboard");
 
-  return handleActionSuccess("/login");
+  redirect("/login");
 }
