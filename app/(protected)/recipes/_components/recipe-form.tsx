@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode, useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ export function RecipeForm({
   isSubmitting,
 }: RecipeFormProps) {
   const form = useForm<RecipeFormValues>({
-    resolver: zodResolver<RecipeFormValues>(recipeFormSchema),
+    resolver: zodResolver(recipeFormSchema) as Resolver<RecipeFormValues>,
     defaultValues: initialValues ?? baseDefaultValues,
   });
 
