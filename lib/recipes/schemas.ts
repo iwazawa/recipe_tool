@@ -15,12 +15,12 @@ export const recipeSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().min(1, "料理名を入力してください。"),
   servings: z
-    .number({ invalid_type_error: "人数には数値を入力してください。" })
+    .number()
     .int("人数は整数で入力してください。")
     .positive("人数は1以上で入力してください。"),
   dishType: dishTypeSchema,
   timeMinutes: z
-    .number({ invalid_type_error: "所要時間には数値を入力してください。" })
+    .number()
     .int("所要時間は整数で入力してください。")
     .positive("所要時間は1分以上で入力してください。")
     .nullable()
