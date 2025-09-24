@@ -77,7 +77,7 @@ export const recipeFormSchema = z.object({
   name: z.string().min(1, "料理名を入力してください。"),
   servings: z
     .coerce
-    .number({ invalid_type_error: "人数には数値を入力してください。" })
+    .number()
     .int("人数は整数で入力してください。")
     .positive("人数は1以上で入力してください。"),
   dishType: dishTypeSchema,
