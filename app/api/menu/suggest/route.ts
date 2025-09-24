@@ -28,6 +28,7 @@ type SupabaseRecipeRow = {
   updated_at: string | null;
   recipe_ingredients: Array<{
     id: string;
+    recipe_id: string;
     name: string;
     amount: number | null;
     unit: string | null;
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
   const { data: recipeRows, error: recipeError } = await supabase
     .from("recipes")
     .select(
-      "id, user_id, name, servings, dish_type, time_minutes, cost_rank, instructions, source_url, created_at, updated_at, recipe_ingredients ( id, name, amount, unit, note )"
+      "id, user_id, name, servings, dish_type, time_minutes, cost_rank, instructions, source_url, created_at, updated_at, recipe_ingredients ( id, recipe_id, name, amount, unit, note )"
     )
     .eq("user_id", user.id)
     .returns<SupabaseRecipeRow[]>();
