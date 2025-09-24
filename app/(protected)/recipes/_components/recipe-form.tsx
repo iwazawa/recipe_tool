@@ -202,6 +202,10 @@ export function RecipeForm({
                 <FormControl>
                   <select
                     {...field}
+                    value={field.value ?? ""}
+                    onChange={(event) =>
+                      field.onChange(event.target.value === "" ? null : event.target.value)
+                    }
                     className="h-11 w-full rounded-xl border border-border/70 bg-background/80 px-4 text-sm shadow-sm transition focus:border-primary/60 focus:outline-none"
                     disabled={isSubmitting}
                   >
