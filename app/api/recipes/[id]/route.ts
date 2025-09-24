@@ -53,7 +53,10 @@ async function fetchRecipeById(
   return { data, error: null };
 }
 
-export async function GET(_request: NextRequest, context: { params: { id: string } }) {
+export async function GET(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const supabase = getSupabaseServerClient();
   const {
     data: { user },
@@ -63,7 +66,7 @@ export async function GET(_request: NextRequest, context: { params: { id: string
     return unauthorized();
   }
 
-  const { id } = paramsSchema.parse(context.params);
+  const { id } = paramsSchema.parse(await context.params);
 
   const { data, error } = await fetchRecipeById(supabase, user.id, id);
 
@@ -82,7 +85,10 @@ export async function GET(_request: NextRequest, context: { params: { id: string
   return Response.json({ data: recipeDto });
 }
 
-export async function PUT(request: NextRequest, context: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const supabase = getSupabaseServerClient();
   const {
     data: { user },
@@ -92,7 +98,7 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
     return unauthorized();
   }
 
-  const { id } = paramsSchema.parse(context.params);
+  const { id } = paramsSchema.parse(await context.params);
 
   let payload: z.infer<typeof recipePayloadSchema>;
 
@@ -176,7 +182,10 @@ export async function PUT(request: NextRequest, context: { params: { id: string 
   return Response.json({ data: mapRecipeRow(fullRecipe, fullRecipe.recipe_ingredients ?? []) });
 }
 
-export async function DELETE(_request: NextRequest, context: { params: { id: string } }) {
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const supabase = getSupabaseServerClient();
   const {
     data: { user },
@@ -186,7 +195,7 @@ export async function DELETE(_request: NextRequest, context: { params: { id: str
     return unauthorized();
   }
 
-  const { id } = paramsSchema.parse(context.params);
+  const { id } = paramsSchema.parse(await context.params);
 
   const { error } = await supabase
     .from("recipes")
