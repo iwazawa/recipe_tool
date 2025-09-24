@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 import { computeSuggestion } from "@/lib/menus/suggest";
+import type { MenuItemRow, MenuRow, ShoppingListRow } from "@/lib/menus/types";
 import { mapRecipeRow } from "@/lib/recipes/mappers";
 import type { Recipe } from "@/lib/recipes/types";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
@@ -103,7 +104,7 @@ export async function POST(request: NextRequest) {
         end_date: suggestion.endDate,
       })
       .select("*")
-      .single();
+      .single<MenuRow>();
 
     if (menuError || !menu) {
       return internalError(menuError?.message ?? "献立の作成に失敗しました。");
@@ -121,7 +122,9 @@ export async function POST(request: NextRequest) {
       .insert(menuItemsPayload)
       .select("*");
 
-    if (menuItemsError || !menuItems) {
+    const typedMenuItems = menuItems as MenuItemRow[] | null;
+
+    if (menuItemsError || !typedMenuItems) {
       await supabase.from("menus").delete().eq("id", menu.id);
       return internalError(menuItemsError?.message ?? "献立の作成に失敗しました。");
     }
@@ -137,7 +140,7 @@ export async function POST(request: NextRequest) {
         source_menu_id: menu.id,
       })
       .select("*")
-      .single();
+      .single<ShoppingListRow>();
 
     if (shoppingListError || !shoppingList) {
       await supabase.from("menu_items").delete().eq("menu_id", menu.id);
@@ -166,7 +169,7 @@ export async function POST(request: NextRequest) {
     return Response.json({
       data: {
         menu,
-        menuItems,
+        menuItems: typedMenuItems,
         shoppingList: {
           id: shoppingList.id,
           title: shoppingList.title,
