@@ -82,7 +82,7 @@ export const recipeFormSchema = z.object({
     .positive("人数は1以上で入力してください。"),
   dishType: dishTypeSchema,
   timeMinutes: optionalPositiveIntString,
-  costRank: costRankSchema.optional().or(z.literal("")),
+  costRank: costRankSchema.nullable().optional(),
   instructions: z.string().optional(),
   sourceUrl: z
     .string()

@@ -108,7 +108,7 @@ export function mapRecipeToFormValues(recipe: Recipe): RecipeFormValues {
     servings: recipe.servings ?? 1,
     dishType: recipe.dishType,
     timeMinutes: recipe.timeMinutes != null ? String(recipe.timeMinutes) : undefined,
-    costRank: recipe.costRank ?? undefined,
+    costRank: recipe.costRank ?? null,
     instructions: recipe.instructions ?? "",
     sourceUrl: recipe.sourceUrl ?? "",
     ingredients: recipe.ingredients.map((ingredient) => ({
@@ -132,7 +132,7 @@ export function recipeFormToPayload(values: RecipeFormValues): RecipePayload {
         ? Number(values.timeMinutes)
         : null,
     costRank:
-      values.costRank && values.costRank !== ""
+      values.costRank
         ? (values.costRank as "S" | "A" | "B" | "C")
         : null,
     instructions: values.instructions?.trim() ? values.instructions : null,
