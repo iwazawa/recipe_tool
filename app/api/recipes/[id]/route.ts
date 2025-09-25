@@ -197,6 +197,83 @@ export async function DELETE(
 
   const { id } = paramsSchema.parse(await context.params);
 
+  const { data: relatedMenuItems, error: relatedMenuItemsError } = await supabase
+    .from("menu_items")
+    .select("menu_id")
+    .eq("recipe_id", id);
+
+  if (relatedMenuItemsError) {
+    return internalError(relatedMenuItemsError.message);
+  }
+
+  const menuIds = Array.from(
+    new Set((relatedMenuItems ?? []).map((item) => item.menu_id).filter(Boolean))
+  ) as string[];
+
+  const { error: menuItemsDeleteError } = await supabase
+    .from("menu_items")
+    .delete()
+    .eq("recipe_id", id);
+
+  if (menuItemsDeleteError) {
+    return internalError(menuItemsDeleteError.message);
+  }
+
+  for (const menuId of menuIds) {
+    const { count: remainingCount, error: remainingCountError } = await supabase
+      .from("menu_items")
+      .select("id", { count: "exact", head: true })
+      .eq("menu_id", menuId);
+
+    if (remainingCountError) {
+      return internalError(remainingCountError.message);
+    }
+
+    if ((remainingCount ?? 0) > 0) {
+      continue;
+    }
+
+    const { data: shoppingLists, error: shoppingListsError } = await supabase
+      .from("shopping_lists")
+      .select("id")
+      .eq("source_menu_id", menuId);
+
+    if (shoppingListsError) {
+      return internalError(shoppingListsError.message);
+    }
+
+    const shoppingListIds = (shoppingLists ?? []).map((list) => list.id);
+
+    if (shoppingListIds.length > 0) {
+      const { error: shoppingListItemsError } = await supabase
+        .from("shopping_list_items")
+        .delete()
+        .in("shopping_list_id", shoppingListIds);
+
+      if (shoppingListItemsError) {
+        return internalError(shoppingListItemsError.message);
+      }
+
+      const { error: shoppingListsDeleteError } = await supabase
+        .from("shopping_lists")
+        .delete()
+        .in("id", shoppingListIds);
+
+      if (shoppingListsDeleteError) {
+        return internalError(shoppingListsDeleteError.message);
+      }
+    }
+
+    const { error: menusDeleteError } = await supabase
+      .from("menus")
+      .delete()
+      .eq("id", menuId);
+
+    if (menusDeleteError) {
+      return internalError(menusDeleteError.message);
+    }
+  }
+
   const { error } = await supabase
     .from("recipes")
     .delete()
