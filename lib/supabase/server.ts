@@ -13,13 +13,13 @@ export async function getSupabaseServerClient() {
 
   return createServerClient<Database>(url, anonKey, {
     cookies: {
-      async get(name: string) {
+      get(name: string) {
         return cookieStore.get(name)?.value;
       },
-      async set(name: string, value: string, options: CookieOptions) {
+      set(name: string, value: string, options: CookieOptions) {
         cookieStore.set({ name, value, ...options });
       },
-      async remove(name: string, options: CookieOptions) {
+      remove(name: string, options: CookieOptions) {
         cookieStore.set({ name, value: "", ...options });
       },
     },
