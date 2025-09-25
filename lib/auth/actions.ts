@@ -21,7 +21,7 @@ function handleActionSuccess(path?: string): ActionResult {
 }
 
 export async function signInWithPasswordAction(values: SignInInput): Promise<ActionResult> {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   let parsedValues: SignInInput;
 
   try {
@@ -44,7 +44,7 @@ export async function signInWithPasswordAction(values: SignInInput): Promise<Act
 }
 
 export async function signUpWithPasswordAction(values: SignUpInput): Promise<ActionResult> {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   let parsedValues: SignUpInput;
 
   try {
@@ -86,7 +86,7 @@ export async function signUpWithPasswordAction(values: SignUpInput): Promise<Act
 }
 
 export async function signOutAction(): Promise<void> {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {

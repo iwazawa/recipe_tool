@@ -33,7 +33,7 @@ function internalError(message: string) {
 }
 
 async function fetchRecipeById(
-  supabase: ReturnType<typeof getSupabaseServerClient>,
+  supabase: Awaited<ReturnType<typeof getSupabaseServerClient>>,
   userId: string,
   id: string
 ) {
@@ -57,7 +57,7 @@ export async function GET(
   _request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -89,7 +89,7 @@ export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -186,7 +186,7 @@ export async function DELETE(
   _request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

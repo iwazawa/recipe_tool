@@ -50,7 +50,7 @@ function internalError(message: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const {
     data: { user },
     error: authError,

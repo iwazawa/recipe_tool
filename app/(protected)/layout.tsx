@@ -13,7 +13,7 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const supabase = getSupabaseServerClient();
+  const supabase = await getSupabaseServerClient();
   const {
     data: { user },
     error,
