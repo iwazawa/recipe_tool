@@ -29,6 +29,7 @@ export function RecipeList() {
   const [dishType, setDishType] = useState<DishTypeFilter>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const deferredSearch = useDeferredValue(searchTerm.trim());
+  const [expandedCards, setExpandedCards] = useState<Record<string, boolean>>({});
 
   const recipesQuery = useQuery({
     queryKey: ["recipes", dishType, deferredSearch],
@@ -55,6 +56,10 @@ export function RecipeList() {
   };
 
   const recipes = useMemo(() => recipesQuery.data ?? [], [recipesQuery.data]);
+
+  const toggleIngredients = (recipeId: string) => {
+    setExpandedCards((prev) => ({ ...prev, [recipeId]: !prev[recipeId] }));
+  };
 
   return (
     <div className="space-y-6">
@@ -141,26 +146,50 @@ export function RecipeList() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>材料リスト</span>
-                      <Button
-                        type="button"
-                        variant="subtle"
-                        size="sm"
-                        className="rounded-full px-3"
-                        onClick={async () => {
-                          const copyText = recipe.ingredients
-                            .map((ingredient) => formatIngredientLine({ ...ingredient }))
-                            .join("\n");
-                          await navigator.clipboard.writeText(copyText);
-                        }}
-                      >
-                        コピー
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="subtle"
+                          size="sm"
+                          className="rounded-full px-3"
+                          onClick={async () => {
+                            const copyText = recipe.ingredients
+                              .map((ingredient) => formatIngredientLine({ ...ingredient }))
+                              .join("\n");
+                            await navigator.clipboard.writeText(copyText);
+                          }}
+                        >
+                          コピー
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="rounded-full px-3 text-xs"
+                          onClick={() => toggleIngredients(recipe.id)}
+                        >
+                          {expandedCards[recipe.id] ? "閉じる" : "表示"}
+                        </Button>
+                      </div>
                     </div>
-                    <ul className="space-y-1 rounded-2xl border border-border/60 bg-background/70 p-4 text-sm text-muted-foreground">
-                      {recipe.ingredients.map((ingredient) => (
-                        <li key={ingredient.id}>{formatIngredientLine({ ...ingredient })}</li>
-                      ))}
-                    </ul>
+                    {expandedCards[recipe.id] ? (
+                      <ul className="space-y-1 rounded-2xl border border-border/60 bg-background/70 p-4 text-sm text-muted-foreground">
+                        {recipe.ingredients.map((ingredient) => (
+                          <li key={ingredient.id}>{formatIngredientLine({ ...ingredient })}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="rounded-2xl border border-border/60 bg-background/70 p-4 text-xs text-muted-foreground">
+                        {recipe.ingredients.slice(0, 3).map((ingredient) => (
+                          <div key={ingredient.id}>{formatIngredientLine({ ...ingredient })}</div>
+                        ))}
+                        {recipe.ingredients.length > 3 ? (
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            ほか {recipe.ingredients.length - 3} 件の材料があります。
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 self-end sm:self-start">
@@ -168,6 +197,7 @@ export function RecipeList() {
                     <Link href={`/recipes/${recipe.id}`}>編集</Link>
                   </Button>
                   <Button
+                    type="button"
                     variant="destructive"
                     size="sm"
                     className="rounded-full px-4"
