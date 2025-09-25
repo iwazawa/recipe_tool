@@ -13,14 +13,14 @@ export async function getSupabaseServerClient() {
 
   return createServerClient<Database>(url, anonKey, {
     cookies: {
-      get(name: string) {
-        return cookieStore.then((store) => store.get(name)?.value);
+      async get(name: string) {
+        return cookieStore.get(name)?.value;
       },
-      set(name: string, value: string, options: CookieOptions) {
-        cookieStore.then((store) => store.set({ name, value, ...options }));
+      async set(name: string, value: string, options: CookieOptions) {
+        cookieStore.set({ name, value, ...options });
       },
-      remove(name: string, options: CookieOptions) {
-        cookieStore.then((store) => store.set({ name, value: "", ...options }));
+      async remove(name: string, options: CookieOptions) {
+        cookieStore.set({ name, value: "", ...options });
       },
     },
   });
